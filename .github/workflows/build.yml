@@ -11,18 +11,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+    
     - name: Setup NDK
       uses: nttld/setup-ndk@v1
       with:
         ndk-version: r25c
     
-    - name: Build with ndk-build
+    - name: Build .so with ndk-build
       run: |
         cd app/src/main/jni
         $ANDROID_NDK_HOME/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk NDK_APPLICATION_MK=Application.mk
     
-    - name: Find .so files
-      run: find . -name "*.so" -type f
+    - name: Download Apktool
+      run: |
+        wget https://github.com/iBotPeaches/Apktool/releases/download/v2.9.3/apktool_2.9.3.jar -O apktool.jar
     
     - name: Upload .so
       uses: actions/upload-artifact@v4
@@ -30,5 +37,4 @@ jobs:
         name: libModMenu
         path: |
           app/src/main/jni/libs/
-          app/src/main/libs/
           **/*.so
